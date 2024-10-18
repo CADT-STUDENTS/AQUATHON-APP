@@ -30,17 +30,18 @@ aquathon-app/
    pnpm install
    ```
 
-## Running the Application
+## Running the Application ( DOCKER )
 
-To run both the frontend and backend concurrently:
+To run both the frontend and backend concurrently with Docker:
    ```
-   pnpm dev
+   docker compose -f dockerfile.dev.yml up --build
    ```
 
 
 This will start:
 - The frontend on `http://localhost:3000`
-- The backend on `http://localhost:4000`
+- The backend docs  on `http://localhost:4000/api-docs`
+- Mongo-express on `http://localhost:8081`
 
 ## Individual Application README Files
 
