@@ -34,20 +34,17 @@ import { db } from '../configs/db'
 export interface ISegment extends Document {
   name?: string
   type: string
-  mode: string
   totalCompleted: number
   timeTrackId?: string[]
   status?:string,
   isShareable?: boolean
+  index?: number;
 }
 
 const SegmentSchema = new Schema<ISegment>({
   name: String,
+  index : Number,
   type: {
-    type: String,
-    required: true
-  },
-  mode: {
     type: String,
     required: true
   },
