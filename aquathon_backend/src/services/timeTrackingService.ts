@@ -57,7 +57,8 @@ export const createTimeTracking = async (
         // Step 1: Create new TimeTracking document
         await Race.findOneAndUpdate(
             {
-                _id: raceId.toString()
+                _id: raceId.toString(),
+                status: "ongoing",
             },
             {
                 $addToSet: {
@@ -119,9 +120,11 @@ export const deleteTimeTrackings = async (
         await Race.findOneAndUpdate(
             {
                 _id: raceId.toString(),
-                'participants._id': data.participantId.toString()
+                'participants._id': data.participantId.toString(),
+                status: "ongoing",
             },
             {
+
                 $pull: {
                     'participants.$.timeTrackings': {
                         segmentId: data.segmentId
@@ -170,7 +173,8 @@ export const assignTimeTracking = async (data: setTrackingProp) => {
 
         await Race.findOneAndUpdate(
             {
-                _id: data.raceId.toString()
+                _id: data.raceId.toString(),
+                status: "ongoing",
             },
             {
                 $pull: {

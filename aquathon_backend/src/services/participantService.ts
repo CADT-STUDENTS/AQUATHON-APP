@@ -5,6 +5,7 @@ import { StatusError } from '../types/common'
 import { handleMongooseError } from '../utils/mongooseError'
 import { getRaceStatus } from './raceService'
 
+
 export const getParticipants = async (raceId: string) => {
   try {
     const data = await Race.find({ _id: raceId }, { participants: 1 })
