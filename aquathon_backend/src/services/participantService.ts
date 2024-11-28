@@ -3,6 +3,7 @@ import { IParticipant } from '../models/participantModel'
 import { Race } from '../models/raceModel'
 import { StatusError } from '../types/common'
 import { handleMongooseError } from '../utils/mongooseError'
+import { getRaceStatus } from './raceService'
 
 export const getParticipants = async (raceId: string) => {
   try {
@@ -47,14 +48,9 @@ export const getParticipantById = async (
   }
 }
 
-export const getAllParticipantDashboard = async (
-  raceId: string,
-) => {
+export const getAllParticipantDashboard = async (raceId: string) => {
   try {
-    const race = await Race.findOne(
-      { _id: raceId  },
-    )
-
+    const race = await Race.findOne({ _id: raceId })
 
     if (!race) {
       throw new StatusError('Race or participant not found', 404)
@@ -74,10 +70,16 @@ export const getAllParticipantDashboard = async (
   }
 }
 
-
-
 export const createParticipant = async (raceId: string, data: IParticipant) => {
   try {
+    const status = await getRaceStatus(raceId)
+    if (status != 'upcoming') {
+      throw new StatusError(
+        'participants can not be create when the race is finished or ongoing',
+        400,
+        null
+      )
+    }
     const result = await Race.findOneAndUpdate(
       {
         _id: new mongoose.Types.ObjectId(raceId),
@@ -146,14 +148,23 @@ export const updateParticipant = async (
   data: Partial<IParticipant>
 ) => {
   try {
+    const status = await getRaceStatus(raceId)
+    if (status !== 'upcoming') {
+        console.log("unable");
+      throw new StatusError(
+        'participants can not be updated when the race is finished or ongoing',
+        400,
+        null
+      )
+    }
     const result = await Race.findOneAndUpdate(
       {
         _id: new mongoose.Types.ObjectId(raceId),
         participants: {
           $elemMatch: {
             _id: new mongoose.Types.ObjectId(participantId),
-            "participants.bib": { $ne: data.bib },
-          },
+            'participants.bib': { $ne: data.bib }
+          }
         }
       },
       {
@@ -169,7 +180,7 @@ export const updateParticipant = async (
       },
       {
         new: true,
-        runValidators: true,
+        runValidators: true
       }
     )
 

@@ -88,6 +88,10 @@ export const createRace = async (data: IRace) => {
 
 // update the race with corresponding id
 export const updateRace = async (id: string, data: Partial<IRace>) => {
+  const status = await getRaceStatus(id);
+  if (status != "upcoming" ) {
+    return new StatusError("Race cannot be edit when it is finished or ongoing", 400, null);
+  }
   const res = await Race.findOneAndUpdate({ _id: id }, data, {
     new: true
   }).catch((error: Error) => {
