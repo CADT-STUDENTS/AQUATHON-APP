@@ -93,7 +93,6 @@ export const updateRace = async (id: string, data: Partial<IRace>) => {
   }).catch((error: Error) => {
     throw handleMongooseError(error)
   })
-
   return res
 }
 
@@ -145,4 +144,13 @@ export const setRaceStartTime = async (
   }
 }
 
-
+export const getRaceStatus = async (id: string) => {
+    try {
+        const status = await Race.find({_id: id}).select([
+        "status",
+        ]);
+        return status[0].status;
+    } catch (error) {
+        return handleMongooseError(error)
+    }
+}

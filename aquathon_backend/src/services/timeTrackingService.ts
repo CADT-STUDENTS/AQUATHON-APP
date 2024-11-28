@@ -3,6 +3,7 @@ import { ITimeTracking, TimeTracking } from '../models/timeTrackingModel'
 import { StatusError } from '../types/common'
 import { Race } from '../models/raceModel'
 import mongoose from 'mongoose'
+import { getRaceStatus } from './raceService'
 export interface setTrackingProp extends Partial<ITimeTracking> {
   _id?: string
   status?: string
@@ -115,6 +116,9 @@ export const deleteTimeTrackings = async (
   data: setTrackingProp
 ) => {
   try {
+    const status =  await getRaceStatus(data.raceId.toString());
+    if(status == "finished") return;
+    if(status == "ongoing") return;
     // Step 1: Create new TimeTracking document
     await Race.findOneAndUpdate(
       {
@@ -147,6 +151,10 @@ export const deleteTimeTrackings = async (
 }
 export const createUnassignedTimeTracking = async (data: setTrackingProp) => {
   try {
+
+    const status =  await getRaceStatus(data.raceId.toString());
+    if(status == "finished") return;
+    if(status == "ongoing") return;
     // Step 1: Create new TimeTracking document
     const timeTracking = new TimeTracking({
       ...data,
@@ -166,6 +174,10 @@ export const createUnassignedTimeTracking = async (data: setTrackingProp) => {
 export const assignTimeTracking = async (data: setTrackingProp) => {
   try {
     // Step 1: Create new TimeTracking document
+    const status =  await getRaceStatus(data.raceId.toString());
+    if(status == "finished") return;
+    if(status == "ongoing") return;
+
     await Race.findOneAndUpdate(
       {
         _id: data.raceId.toString()
