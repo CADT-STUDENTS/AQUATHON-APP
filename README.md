@@ -1,4 +1,4 @@
-# Aquathon App 
+# Aquathon App
 
 This monorepo contains the frontend and backend applications for the Aquathon race tracking system.
 

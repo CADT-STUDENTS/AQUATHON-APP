@@ -1,4 +1,5 @@
 import { Server, Socket } from 'socket.io'
+
 import {
   ClientToServerEvents,
   InterServerEvents,
@@ -11,7 +12,7 @@ import {
   deleteOneUnassignedTimeTracking,
   resetTracking,
   setTracking,
-  setTrackingProp
+  IRaceSocketPayload
 } from '../services/timeTrackingService'
 import { StatusError } from '../types/common'
 type ServerProp = Server<
@@ -24,10 +25,10 @@ type ServerProp = Server<
 const RaceHandler = (io: ServerProp, socket: Socket<ClientToServerEvents>) => {
   let raceID: string | null = null
   let raceRoom = io.to(null)
-  const startTime = (payload) => {
+  const startTime = (payload: string) => {
     setRaceStartTime(payload, 'start')
       .then((data) => {
-        raceRoom.emit('startTimeChanged', data?.startTime)
+        raceRoom.emit('startTimeChanged', data.startTime)
       })
       .catch((e) => console.log(e))
   }
@@ -36,7 +37,7 @@ const RaceHandler = (io: ServerProp, socket: Socket<ClientToServerEvents>) => {
     if (payload === undefined || null) return
     setRaceStartTime(payload, 'reset')
       .then((data) => {
-        raceRoom.emit('startTimeChanged', data?.startTime)
+        raceRoom.emit('startTimeChanged', data.startTime)
       })
       .catch((e) => {
         throw new StatusError(e)
@@ -50,7 +51,7 @@ const RaceHandler = (io: ServerProp, socket: Socket<ClientToServerEvents>) => {
     raceRoom.emit('subscribeAccepted', { roomId: raceID })
   }
 
-  const trackTime = (payload: setTrackingProp) => {
+  const trackTime = (payload: IRaceSocketPayload) => {
     setTracking(payload)
       .then((data) => {
         raceRoom.emit('poolChanged', data)
@@ -63,7 +64,7 @@ const RaceHandler = (io: ServerProp, socket: Socket<ClientToServerEvents>) => {
   }
 
   // reset for 1-step
-  const resetTimeTracking = (payload: setTrackingProp) => {
+  const resetTimeTracking = (payload: IRaceSocketPayload) => {
     resetTracking(payload)
       .then((data) => {
         raceRoom.emit('poolChanged', data)
@@ -75,7 +76,7 @@ const RaceHandler = (io: ServerProp, socket: Socket<ClientToServerEvents>) => {
   }
 
   // reset for 1-step
-  const unassignedStamp = (payload: setTrackingProp) => {
+  const unassignedStamp = (payload: IRaceSocketPayload) => {
     if (payload.status == 'delete') {
       deleteOneUnassignedTimeTracking(payload)
         .then((data) => {
@@ -97,7 +98,7 @@ const RaceHandler = (io: ServerProp, socket: Socket<ClientToServerEvents>) => {
       })
   }
 
-  const assignStamp = (payload: setTrackingProp) => {
+  const assignStamp = (payload: IRaceSocketPayload) => {
     setTracking(payload)
       .then((data) => {
         raceRoom.emit('poolChanged', data)

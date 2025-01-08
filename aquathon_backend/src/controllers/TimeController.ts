@@ -1,14 +1,15 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 
 class TimeControllers {
-  static async getTime(req: Request, res: Response) {
+  static async getTime(req: Request, res: Response, next: NextFunction) {
     const time = new Date()
-    return res.status(200).send({ time: time, now: time.getTime()})
+    next()
+    return res.status(200).send({ time: time, now: time.getTime() })
   }
   // Ms is millisecond
   static async getRaceMsCount(req: Request, res: Response) {
     const time = new Date()
-    return res.status(200).send({ time: time, now: time.getTime()})
+    return res.status(200).send({ time: time, now: time.getTime() })
   }
 }
 

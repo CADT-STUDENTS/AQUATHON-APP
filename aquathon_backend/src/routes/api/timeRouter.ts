@@ -1,9 +1,7 @@
-import {Router} from "express"
-import TimeControllers from "../../controllers/TimeController";
+import TimeControllers from '../../controllers/TimeController'
+import { Router } from 'express'
 
-
-const router = Router();
-
+const router = Router()
 
 /**
  * @openapi
@@ -26,6 +24,5 @@ const router = Router();
  *                   format: time(number)
  *                   example: "124562346"
  */
-router.get("/now",TimeControllers.getTime)
-
-export default router;
+router.get('/now', TimeControllers.getTime)
+export default router

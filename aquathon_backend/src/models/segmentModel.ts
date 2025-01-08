@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from 'mongoose'
+import mongoose, { Schema, Types } from 'mongoose'
 import { db } from '../configs/db'
 /**
  * @swagger
@@ -31,19 +31,20 @@ import { db } from '../configs/db'
  *         timeTrack: []
  */
 
-export interface ISegment extends Document {
+export interface ISegment {
+  _id?: Types.ObjectId
   name?: string
   type: string
   totalCompleted: number
   timeTrackId?: string[]
-  status?:string,
+  status?: string
   isShareable?: boolean
-  index?: number;
+  index?: number
 }
 
 const SegmentSchema = new Schema<ISegment>({
   name: String,
-  index : Number,
+  index: Number,
   type: {
     type: String,
     required: true
@@ -51,7 +52,7 @@ const SegmentSchema = new Schema<ISegment>({
   timeTrackId: [String],
   totalCompleted: Number,
   status: String,
-  isShareable: mongoose.SchemaTypes.Boolean,
+  isShareable: mongoose.SchemaTypes.Boolean
 })
 
 export const Segment = db.model('Segment', SegmentSchema)

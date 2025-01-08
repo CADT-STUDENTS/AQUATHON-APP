@@ -5,10 +5,7 @@ import { handleMongooseError } from '../utils/mongooseError'
 import { TimeTracking } from '../models/timeTrackingModel'
 
 export const getRaces = async (limit: number = 2, page: number = 1) => {
-  const data = await Race.find(
-    {},
-    { participants: 0 }
-  )
+  const data = await Race.find({}, { participants: 0 })
     .skip((page - 1) * limit)
     .limit(limit)
     .sort({ updatedAt: -1 })
@@ -55,30 +52,33 @@ export const getRacesGroupy = async (limit = 2, page = 1) => {
 // NOTE: need more work in the future where you can select field from client
 export const getRace = async (id: string): Promise<IRace | null> => {
   try {
-    const query = Race.findById(id).select({participants : 0, timeTracking: 0});
+    const query = Race.findById(id).select({ participants: 0, timeTracking: 0 })
 
-    const race = await query.exec();
+    const race = await query.exec()
 
     if (!race) {
       // If no race is found, return null instead of throwing an error
-      return null;
+      return null
     }
 
-    return race;
+    return race
   } catch (error) {
-    throw handleMongooseError(error);
+    throw handleMongooseError(error)
   }
-};
+}
 
-// delete the race with new obj
+//create the race with new obj
 export const createRace = async (data: IRace) => {
+  if (data.segments.length == 0) {
+    throw new StatusError('Segments but be provide', 400)
+  }
   const new_race = new Race({
     ...data,
     startTime: null,
     status: 'upcoming',
     totalParticipants: 0,
     segmentsCompleted: 0,
-    date: new Date(data.date),
+    date: new Date(data.date)
   })
   const res = await new_race.save().catch((error: Error) => {
     throw handleMongooseError(error)
@@ -88,9 +88,13 @@ export const createRace = async (data: IRace) => {
 
 // update the race with corresponding id
 export const updateRace = async (id: string, data: Partial<IRace>) => {
-  const status = await getRaceStatus(id);
-  if (status != "upcoming" ) {
-    return new StatusError("Race cannot be edit when it is finished or ongoing", 400, null);
+  const status = await getRaceStatus(id)
+  if (status != 'upcoming') {
+    throw new StatusError(
+      'Race cannot be edit when it is finished or ongoing',
+      400,
+      null
+    )
   }
   const res = await Race.findOneAndUpdate({ _id: id }, data, {
     new: true
@@ -102,8 +106,12 @@ export const updateRace = async (id: string, data: Partial<IRace>) => {
 
 // delete the race with corresponding id
 export const deleteRace = async (id: string) => {
-  const race = Race.find({ _id: id })
-  const res = await race.deleteOne().catch((error) => {
+  const status = await getRaceStatus(id)
+
+  if (status == 'ongoing') {
+    throw new StatusError('Race cannot be delete when it is ongoing', 400, null)
+  }
+  const res = Race.deleteOne({ _id: id }).catch((error) => {
     throw handleMongooseError(error)
   })
   return res
@@ -120,7 +128,7 @@ export const getRaceStartTime = async (id: string) => {
 export const setRaceStartTime = async (
   id: string,
   status: 'start' | 'reset'
-) => {
+): Promise<IRace> => {
   try {
     const result = await Race.find({ _id: id }).select([
       'status',
@@ -136,25 +144,23 @@ export const setRaceStartTime = async (
     } else if (status == 'reset') {
       data.startTime = null
       data.status = 'upcoming'
-      data.segments.map(item => item.totalCompleted = 0)
-      data.participants.map(item => item.timeTrackings=[])
+      data.segments.map((item) => (item.totalCompleted = 0))
+      data.participants.map((item) => (item.timeTrackings = []))
       data.timeTracking = []
-      await TimeTracking.deleteMany({raceId: data._id});
+      await TimeTracking.deleteMany({ raceId: data._id })
     }
     const res = await data.save()
     return res
   } catch (error) {
-    return handleMongooseError(error)
+    throw handleMongooseError(error)
   }
 }
 
 export const getRaceStatus = async (id: string) => {
-    try {
-        const status = await Race.find({_id: id}).select([
-        "status",
-        ]);
-        return status[0].status;
-    } catch (error) {
-        return handleMongooseError(error)
-    }
+  try {
+    const status = await Race.find({ _id: id }).select(['status'])
+    return status[0].status
+  } catch (error) {
+    return handleMongooseError(error)
+  }
 }

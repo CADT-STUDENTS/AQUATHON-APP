@@ -22,7 +22,7 @@ export async function getSegment(
 ): Promise<ISegment> {
   try {
     const segments = await Race.findOne({ _id: raceId })
-    return segments.segments.find((seg) => seg.id === segmentId)
+    return segments.segments.find((seg) => seg._id.toString() === segmentId)
   } catch (error) {
     throw handleMongooseError(error)
   }
@@ -30,9 +30,8 @@ export async function getSegment(
 
 interface IParticipantWithTime extends Omit<IParticipant, 'timeTracking'> {
   stampTime: Date | null
-  previouseTime:Date | null
+  previouseTime: Date | null
 }
-
 
 // with different collection
 
@@ -41,7 +40,7 @@ export async function getParticipantsBySegment(
   segmentId: string
 ) {
   try {
-   const result = await Race.aggregate<IParticipantWithTime>([
+    const result = await Race.aggregate<IParticipantWithTime>([
       // Match the specific race
       { $match: { _id: new mongoose.Types.ObjectId(raceId) } },
       // Unwind participants array
@@ -81,16 +80,16 @@ export async function getParticipantsBySegment(
           lastName: 1,
           colour: 1,
           stampTime: '$stampTime.stampTime', // Extract the actual timestamp value
-          previouseTime: 1,
+          previouseTime: 1
         }
       },
-      { $sort : { bib: 1} }
+      { $sort: { bib: 1 } }
       // Extract totalCompleted from the filtered segment object
     ])
     //NOTE: add 2 temporary added
-    const segment = await getSegment(raceId, segmentId);
-    const unassignedTime = await getUnassignedTrackTime(raceId, segmentId);
-    return { participants:result,segment, unassignedTime}
+    const segment = await getSegment(raceId, segmentId)
+    const unassignedTime = await getUnassignedTrackTime(raceId, segmentId)
+    return { participants: result, segment, unassignedTime }
   } catch (error) {
     console.error('Error retrieving participants:', error)
     throw error

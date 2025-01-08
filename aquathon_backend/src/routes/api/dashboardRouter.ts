@@ -1,8 +1,7 @@
-import { Router } from 'express';
-import DashboardController from '../../controllers/DasboardController';
+import { Router } from 'express'
+import DashboardController from '../../controllers/DasboardController'
 
-const router = Router();
-
+const router = Router()
 /**
  * @swagger
  * /api/races/{raceId}/dashboard:
@@ -26,6 +25,6 @@ const router = Router();
  *       500:
  *         description: Server error
  */
-router.get('/:raceId/dashboard', DashboardController.getDashboard);
+router.get('/:raceId/dashboard', DashboardController.getDashboard)
 
-export default router;
+export default router

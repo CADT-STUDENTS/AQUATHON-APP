@@ -71,6 +71,7 @@ class RaceController {
       const data = await deleteRace(param)
       return res.status(200).send(data)
     } catch (error) {
+      console.log(error);
       return res.status(error.statusCode).send(error)
     }
   }

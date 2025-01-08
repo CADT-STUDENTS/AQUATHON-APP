@@ -1,11 +1,15 @@
 import mongoose from 'mongoose'
-const db_url = process.env.NODE_MONGODB;
-export const db = mongoose.createConnection(db_url, {})
+const db_url = process.env.NODE_MONGODB
+export let db = null
 
+export async function initializeDB() {
+  db = mongoose.createConnection(db_url, {})
+  return db
+}
 export function connectDB() {
   try {
     db.on('connected', () => {
-    db.syncIndexes();
+      db.syncIndexes()
       console.log(
         {
           status: true,
@@ -15,21 +19,21 @@ export function connectDB() {
       )
     })
 
-    // If the connection throws an error
-    db.on('error', (err) => {
-      console.log(
-        { status: false, msg: 'handle mongo errored connections: ' + err },
-        'service'
-      )
-      connectDB()
-    })
-    // When the connection is disconnected
-    db.on('disconnected', () => {
-      console.log(
-        { status: false, msg: 'Mongoose default connection disconnected' },
-        'service'
-      )
-    })
+      // If the
+      .on('error', (err) => {
+        console.log(
+          { status: false, msg: 'handle mongo errored connections: ' + err },
+          'service'
+        )
+        //connectDB()
+      })
+      // When the connection is disconnected
+      .on('disconnected', () => {
+        console.log(
+          { status: false, msg: 'Mongoose default connection disconnected' },
+          'service'
+        )
+      })
 
     process.on('SIGINT', () => {
       db.close(true)
