@@ -4,8 +4,8 @@
 module.exports = {
   testEnvironment: 'node',
   testPathIgnorePatterns: ['<rootDir>/dist/'],
-  globalSetup: '<rootDir>/src/test/index.ts',
-  setupFiles: ['<rootDir>/src/test/setup-tests.ts'],
+  setupFilesAfterEnv: ['<rootDir>/src/test/setup-tests.ts'],
+  //globalSetup: '<rootDir>/src/test/index.ts',
   transform: {
     '^.+.tsx?$': ['ts-jest', {}]
   }

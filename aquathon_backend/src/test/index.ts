@@ -1,15 +1,18 @@
 import supertest from 'supertest'
 import app from '../app'
-import { db, initializeDB } from '../configs/db'
-import * as dotenv from 'dotenv'
+import { initializeDB } from '../configs/db'
 import path from 'path'
+import * as dotenv from 'dotenv'
 
-export const appTest = supertest(app)
 dotenv.config({ path: path.resolve(__dirname, '../../.env.test') })
-
-export default async function setUp() {
-  await initializeDB()
-
-  console.log(db)
-  return db.asPromise()
+async function setUp() {
+  try {
+    console.log('-=>')
+    console.log(process.env.NODE_MONGODB)
+    await initializeDB()
+  } catch (error) {
+    console.log(error)
+  }
 }
+
+export default setUp

@@ -1,10 +1,10 @@
 import mongoose from 'mongoose'
 const db_url = process.env.NODE_MONGODB
-export let db = null
+export const db = mongoose.createConnection(db_url, {})
 
 export async function initializeDB() {
-  db = mongoose.createConnection(db_url, {})
-  return db
+  connectDB()
+  return db.asPromise()
 }
 export function connectDB() {
   try {
