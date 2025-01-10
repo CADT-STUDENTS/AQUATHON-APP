@@ -237,3 +237,8 @@ export const getUnassignedTrackTime = async (
     )
   }
 }
+
+// @Todo
+// allow the time track to be reset based on condition
+// - if the participant is not already been tracked on the next segment or the race has not been completed
+export const checkIfCanRedo = () => {}
